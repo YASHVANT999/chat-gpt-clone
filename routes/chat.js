@@ -45,13 +45,12 @@ router.get('/get-all-conversations', authMiddleware, async (req, res) => {
 //get a single conversations by id.
 router.get('/get-conversation/:id', authMiddleware, async (req, res) => {
   try {
-    const {id}= request.param
-    const userId = req.user.userId;
-    console.log("Fetching conversations for user:", userId);
+    const {id}= req.params;
+    console.log("Fetching conversations for user:", userId,id);
 
-    const chats = await Chat.findOne({ userId,chatId:id });
+    const chats = await Chat.findOne({ _id:id });
 
-    res.status(200).json({ message: 'All Conversations retrieved successfully', chats });
+    res.status(200).json({ message: 'Conversations retrieved successfully', chats });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });
@@ -84,15 +83,13 @@ router.post('/chat', authMiddleware, async (req, res) => {
       }
     } else {
         // Create a new conversation
-        const summary = await OpenAIService.summarizeChat("orizin of hello");
-
         chat = new Chat({
          userId: userId,
           title: userPrompt,
           conversations: [
             {
               userPrompt,
-            botResponse:  summary
+              botResponse
             }
           ]
         });
