@@ -26,12 +26,32 @@ const validateSearch = [
   query('userId').optional().trim()
 ];
 
-router.get('/get-all-conversation', authMiddleware, async (req, res) => {
+// Get all conversations for a user.
+router.get('/get-all-conversations', authMiddleware, async (req, res) => {
   try {
     const userId = req.user.userId;
-    console.log("Hello this yashvant:",userId);
-    const chat= Chat.logic({userId:userId});
-    res.status(201).json({ message: 'Chat saved successfully', chat });
+    console.log("Fetching conversations for user:", userId);
+
+    const chats = await Chat.find({ userId });
+
+    res.status(200).json({ message: 'All Conversations retrieved successfully', chats });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+//get a single conversations by id.
+router.get('/get-conversation/:id', authMiddleware, async (req, res) => {
+  try {
+    const {id}= request.param
+    const userId = req.user.userId;
+    console.log("Fetching conversations for user:", userId);
+
+    const chats = await Chat.findOne({ userId,chatId:id });
+
+    res.status(200).json({ message: 'All Conversations retrieved successfully', chats });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });
@@ -39,7 +59,7 @@ router.get('/get-all-conversation', authMiddleware, async (req, res) => {
 });
 
 // Create or update a chat conversation
-router.post('/new-chat', authMiddleware, async (req, res) => {
+router.post('/chat', authMiddleware, async (req, res) => {
   try {
     const { chatId, userPrompt, botResponse } = req.body;
     const userId = req.user.userId;
@@ -64,13 +84,15 @@ router.post('/new-chat', authMiddleware, async (req, res) => {
       }
     } else {
         // Create a new conversation
+        const summary = await OpenAIService.summarizeChat("orizin of hello");
+
         chat = new Chat({
          userId: userId,
           title: userPrompt,
           conversations: [
             {
               userPrompt,
-              botResponse
+            botResponse:  summary
             }
           ]
         });

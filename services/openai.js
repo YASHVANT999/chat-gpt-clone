@@ -8,7 +8,7 @@ class OpenAIService {
     this.openai = new OpenAIApi(configuration);
   }
 
-  async summarizeChat(messages) {
+ static async summarizeChat(messages) {
     try {
       const messageText = messages
         .map(m => `${new Date(m.timestamp).toISOString()}: ${m.message}`)
