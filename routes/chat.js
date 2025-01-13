@@ -34,7 +34,7 @@ router.get('/get-all-conversations', authMiddleware, async (req, res) => {
 
     const chats = await Chat.find({ userId });
 
-    res.status(200).json({ message: 'All Conversations retrieved successfully', chats });
+    res.status(200).json({ message: 'All Conversations fetched successfully', chats });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });
