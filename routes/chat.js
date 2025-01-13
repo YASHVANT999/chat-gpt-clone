@@ -46,7 +46,6 @@ router.get('/get-all-conversations', authMiddleware, async (req, res) => {
 router.get('/get-conversation/:id', authMiddleware, async (req, res) => {
   try {
     const {id}= req.params;
-    console.log("Fetching conversations for user:", userId,id);
 
     const chats = await Chat.findOne({ _id:id });
 
