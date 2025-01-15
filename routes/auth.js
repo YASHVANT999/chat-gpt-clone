@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/jwt');
 const { authLimiter } = require('../middleware/rateLimiter');
 const User =require('../models/User');
+const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -104,16 +105,15 @@ const validateLogin = [
   });
 
   // Reset Password
-  router.post('/reset-password', async (req, res) => {
+  router.put('/reset-password',authMiddleware, async (req, res) => {
     try {
-      const { token, newPassword } = req.body;
-      
-      const decoded = jwt.verify(token, JWT_SECRET);
-
+      const {  newPassword } = req.body;
+      const userId = req.user.id;
+      console.log(userId);
       const hashedPassword = await bcrypt.hash(newPassword, 10);
-      await User.updateOne(
-        { _id: new ObjectId(decoded.userId) },
-        { 
+      await User.findByIdAndUpdate(
+        { _id: userId },
+        {
           $set: { 
             password: hashedPassword,
             updatedAt: new Date()
@@ -126,6 +126,7 @@ const validateLogin = [
       if (error.name === 'JsonWebTokenError') {
         return res.status(400).json({ error: 'Invalid or expired token' });
       }
+      console.log(error);
       res.status(500).json({ error: 'Server error' });
     }
   });

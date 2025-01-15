@@ -45,13 +45,16 @@ router.get('/get-all-conversations', authMiddleware, async (req, res) => {
 //get a single conversations by id.
 router.get('/get-conversation/:id', authMiddleware, async (req, res) => {
   try {
+
     const {id}= req.params;
 
     const chats = await Chat.findOne({ _id:id });
 
     res.status(200).json({ message: 'Conversations retrieved successfully', chats });
   } catch (error) {
+
     console.error(error);
+
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -81,10 +84,30 @@ router.put('/get-conversation/:id', authMiddleware, async (req, res) => {
       { $set: { title: title } },
       { new: true }
     );
-    
-    res.status(200).json({ message: 'Conversation Deleted Successfully', chats });
+    res.status(200).json({ message: 'Conversation Updated Successfully', chats });
   } catch (error) {
+
     console.error(error);
+
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+//update a single conversations by id.
+router.put('/like-chat/', authMiddleware, async (req, res) => {
+  try {
+    const {id,chatId,status}=req.body;
+
+    const chat = await Chat.findOneAndUpdate(
+      { _id: chatId, 'conversations._id': id },
+      { $set: { 'conversations.$.likeStatus': status } },
+      { new: true }
+    );
+    res.status(200).json({ message: 'Conversation Updated Successfully', chat });
+  } catch (error) {
+
+    console.error(error);
+
     res.status(500).json({ error: 'Server error' });
   }
 });

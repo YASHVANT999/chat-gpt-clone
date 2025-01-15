@@ -25,6 +25,10 @@ const chatSchema = new Schema({
         type: String,
         required: true
       },
+      likeStatus:{
+        type:Number,
+        default:0
+      },
       timestamp: {
         type: Date,
         default: Date.now
