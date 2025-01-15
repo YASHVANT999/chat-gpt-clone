@@ -62,6 +62,25 @@ router.delete('/get-conversation/:id', authMiddleware, async (req, res) => {
     const {id}= req.params;
 
     const chats = await Chat.findByIdAndDelete({ _id:id });
+
+    res.status(200).json({ message: 'Conversation Deleted Successfully', chats });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+//update a single conversations by id.
+router.put('/get-conversation/:id', authMiddleware, async (req, res) => {
+  try {
+    const {title}=req.body;
+    const {id}= req.params;
+
+    const chats = await Chat.findByIdAndUpdate(
+      { _id: id },
+      { $set: { title: title } },
+      { new: true }
+    );
     
     res.status(200).json({ message: 'Conversation Deleted Successfully', chats });
   } catch (error) {
@@ -115,168 +134,4 @@ router.post('/chat', authMiddleware, async (req, res) => {
   }
 });
 
-
-
 module.exports = router;
-
-// module.exports = (db) => {
-
-//   // Create message
-//   router.post('/', 
-//     authMiddleware,
-//     validateCreateMessage,
-//     async (req, res) => {
-//       try {
-//         const errors = validationResult(req);
-//         if (!errors.isEmpty()) {
-//           return res.status(400).json({
-//             status: 'error',
-//             errors: errors.array()
-//           });
-//         }
-
-//         const { chatId, message } = req.body;
-//         const userId = req.user.userId;
-
-//         const chat = await Chat.createMessage({
-//           chatId,
-//           userId,
-//           message
-//         });
-
-//         res.status(201).json({
-//           status: 'success',
-//           data: chat
-//         });
-//       } catch (error) {
-//         res.status(500).json({
-//           status: 'error',
-//           message: 'Failed to create message'
-//         });
-//       }
-//     }
-//   );
-
-//   // Get chat history
-//   router.get('/:chatId',
-//     authMiddleware,
-//     chatAuth(db),
-//     validateGetHistory,
-//     async (req, res) => {
-//       try {
-//         const errors = validationResult(req);
-//         if (!errors.isEmpty()) {
-//           return res.status(400).json({
-//             status: 'error',
-//             errors: errors.array()
-//           });
-//         }
-
-//         const { chatId } = req.params;
-//         const page = parseInt(req.query.page) || 1;
-//         const limit = parseInt(req.query.limit) || 20;
-
-//         const result = await Chat.getChatHistory(chatId, { page, limit });
-
-//         res.json({
-//           status: 'success',
-//           data: result
-//         });
-//       } catch (error) {
-//         res.status(500).json({
-//           status: 'error',
-//           message: 'Failed to fetch chat history'
-//         });
-//       }
-//     }
-//   );
-
-//   // Search messages
-//   router.get('/search',
-//     authMiddleware,
-//     validateSearch,
-//     async (req, res) => {
-//       try {
-//         const errors = validationResult(req);
-//         if (!errors.isEmpty()) {
-//           return res.status(400).json({
-//             status: 'error',
-//             errors: errors.array()
-//           });
-//         }
-
-//         const { keyword, chatId, userId } = req.query;
-//         const messages = await Chat.searchMessages({ 
-//           userId, 
-//           keyword, 
-//           chatId 
-//         });
-
-//         res.json({
-//           status: 'success',
-//           data: messages
-//         });
-//       } catch (error) {
-//         res.status(500).json({
-//           status: 'error',
-//           message: 'Failed to search messages'
-//         });
-//       }
-//     }
-//   );
-
-//   // Delete chat
-//   router.delete('/:chatId',
-//     authMiddleware,
-//     chatAuth(db),
-//     async (req, res) => {
-//       try {
-//         const { chatId } = req.params;
-//         const deletedCount = await Chat.deleteChat(chatId);
-
-//         res.json({
-//           status: 'success',
-//           data: { deletedCount }
-//         });
-//       } catch (error) {
-//         res.status(500).json({
-//           status: 'error',
-//           message: 'Failed to delete chat'
-//         });
-//       }
-//     }
-//   );
-
-//   // Get chat summary
-//   router.get('/:chatId/summary',
-//     authMiddleware,
-//     chatAuth(db),
-//     async (req, res) => {
-//       try {
-//         const { chatId } = req.params;
-//         const messages = await Chat.getChatMessagesForSummary(chatId);
-        
-//         if (messages.length === 0) {
-//           return res.status(404).json({
-//             status: 'error',
-//             message: 'No messages found for this chat'
-//           });
-//         }
-
-//         const summary = await OpenAIService.summarizeChat(messages);
-
-//         res.json({
-//           status: 'success',
-//           data: { summary }
-//         });
-//       } catch (error) {
-//         res.status(500).json({
-//           status: 'error',
-//           message: 'Failed to generate chat summary'
-//         });
-//       }
-//     }
-//   );
-
-//   return router;
-// };
