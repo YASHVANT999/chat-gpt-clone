@@ -12,7 +12,9 @@ const router = express.Router();
 const validateRegistration = [
   body('email').isEmail().normalizeEmail(),
   body('password').isLength({ min: 6 }),
-  body('name').trim().notEmpty()
+  body('name').trim().notEmpty().withMessage('Name is required'),
+  body('username').trim().notEmpty().withMessage('Username is required'),
+
 ];
 
 const validateLogin = [
@@ -21,13 +23,14 @@ const validateLogin = [
 ];
 
   // Register
-  router.post('/register', validateRegistration, async (req, res) => {
+  router.post('/register', async (req, res) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
-      const { email, password, name } = req.body;
+      const { email, password, name ,username} = req.body;
+      console.log(req.body);
       
       const existingUser = await User.findOne({ email: email.toLowerCase() });
       if (existingUser) {
@@ -35,9 +38,9 @@ const validateLogin = [
       }
       const hashedPassword = await bcrypt.hash(password, 10);
       const user = new User({
-        username :name,
+      name:name,
         email: email.toLowerCase(),
-        password: hashedPassword,
+        password: hashedPassword,username:username
       });
       await user.save();
       res.status(201).json({ message: 'User registered successfully', user });
