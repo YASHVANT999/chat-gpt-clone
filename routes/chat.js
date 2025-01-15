@@ -56,6 +56,20 @@ router.get('/get-conversation/:id', authMiddleware, async (req, res) => {
   }
 });
 
+//delete a single conversations by id.
+router.delete('/get-conversation/:id', authMiddleware, async (req, res) => {
+  try {
+    const {id}= req.params;
+
+    const chats = await Chat.findByIdAndDelete({ _id:id });
+    
+    res.status(200).json({ message: 'Conversation Deleted Successfully', chats });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // Create or update a chat conversation
 router.post('/chat', authMiddleware, async (req, res) => {
   try {
