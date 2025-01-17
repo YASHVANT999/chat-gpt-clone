@@ -104,29 +104,39 @@ const validateLogin = [
     }
   });
 
-  // Reset Password
-  router.put('/reset-password',authMiddleware, async (req, res) => {
+//reset-user-password
+  router.post('/reset-password', authMiddleware, async (req, res) => {
     try {
-      const {  newPassword } = req.body;
-      const userId = req.user.id;
-      console.log(userId);
+      const { currentPassword, newPassword } = req.body;
+      const userId = req.user.userId;
+  
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+  
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ error: 'Current password is incorrect' });
+      }
+  
       const hashedPassword = await bcrypt.hash(newPassword, 10);
-      await User.findByIdAndUpdate(
+      await User.findOneAndUpdate(
         { _id: userId },
         {
-          $set: { 
+          $set: {
             password: hashedPassword,
             updatedAt: new Date()
           }
         }
       );
-
+  
       res.json({ message: 'Password updated successfully' });
     } catch (error) {
       if (error.name === 'JsonWebTokenError') {
         return res.status(400).json({ error: 'Invalid or expired token' });
       }
-      console.log(error);
+      console.error('Error resetting password:', error);
       res.status(500).json({ error: 'Server error' });
     }
   });
