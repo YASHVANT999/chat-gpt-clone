@@ -74,6 +74,20 @@ router.delete('/get-conversation/:id', authMiddleware, async (req, res) => {
   }
 });
 
+//delete all conversations by userid.
+router.delete('/delete-all-conversations', authMiddleware, async (req, res) => {
+  try {
+    const userId= req.user.userId;
+
+    const chats = await Chat.deleteMany({userId:userId});
+
+    res.status(200).json({ message: 'All Conversations Deleted Successfully', chats });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 //update a single conversations by id.
 router.put('/get-conversation/:id', authMiddleware, async (req, res) => {
   try {
