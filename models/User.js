@@ -35,6 +35,27 @@ const userSchema = new Schema({
   }
 });
 
-const User = mongoose.model('User', userSchema);
+const otpVerificationSchema = mongoose.Schema(
+  {
+    userId: {
+      type: String,
+      required: true,
+    },
+    otp: {
+      type: String,
+      required: true,
+    },
+    expireAt: {
+      type: Date,
+      default: Date.now() + 3600000 * +1,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-module.exports = User;
+const User = mongoose.model('User', userSchema);
+const Otp =  mongoose.model('Otp',otpVerificationSchema);
+
+module.exports = {User,Otp};

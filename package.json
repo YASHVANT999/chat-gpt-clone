@@ -15,6 +15,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.3.0",
     "mongoose": "^8.9.3",
+    "nodemailer": "^6.9.16",
     "nodemon": "^3.1.9",
     "openai": "^4.0.0"
   }
